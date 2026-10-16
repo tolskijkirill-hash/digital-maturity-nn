@@ -10,6 +10,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && unzip -q /tmp/source.zip -d /tmp/source \
     && cp -a /tmp/source/digital_maturity_mvp/. /app/ \
+    && python -c "import re; from pathlib import Path; p=Path('/app/app/main.py'); s=p.read_text(); s=re.sub(r\"templates\\.TemplateResponse\\('([^']+)',\\{'request':request,\", r\"templates.TemplateResponse(request, '\\1', {\", s); p.write_text(s)" \
     && rm -rf /tmp/source /tmp/source.zip \
     && pip install --no-cache-dir -r requirements.txt \
     && mkdir -p /data
