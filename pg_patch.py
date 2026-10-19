@@ -116,4 +116,19 @@ css += r'''
 @media(max-width:650px){.brand-row{padding:12px 14px;gap:10px;flex-wrap:wrap}.brand-minprom{width:calc(50% - 10px);flex:1 1 calc(50% - 10px)}.brand-minprom img{max-height:44px}.brand-divider{height:42px}.brand-ocpb{flex:1 1 calc(50% - 10px);gap:7px}.ocpb-mark{width:43px;height:36px}.ocpb-name{font-size:10px}.hero-home{padding:28px 18px 0}.hero-home h1{font-size:30px}.hero-home>p{font-size:15px}.hero-cta{width:100%;min-width:0}.home-benefits{grid-template-columns:1fr;gap:0;padding:7px 0}.home-benefit,.home-benefit+.home-benefit{border-left:0;padding:13px 0;gap:14px}.home-benefit+.home-benefit{border-top:1px solid #ffffff44}.benefit-icon{font-size:29px;width:36px}.layout{margin-top:14px}}
 '''
 css_path.write_text(css, encoding='utf-8')
+# CSS cache-busting: derive URL version from the final stylesheet.
+# Each distinct CSS build gets a distinct URL, so browsers cannot reuse stale styles.
+import hashlib as _hashlib
+
+base_path = templates_root / 'base.html'
+base_html = base_path.read_text(encoding='utf-8')
+css_version = _hashlib.sha256(css_path.read_bytes()).hexdigest()[:12]
+
+base_html = _re.sub(
+    r'href="/static/style\.css(?:\?v=[^"]*)?"',
+    f'href="/static/style.css?v={css_version}"',
+    base_html,
+)
+
+base_path.write_text(base_html, encoding='utf-8')
 
